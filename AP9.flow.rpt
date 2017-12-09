@@ -1,5 +1,5 @@
 Flow report for AP9
-Wed Dec 06 15:10:49 2017
+Fri Dec 08 20:57:07 2017
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
 
 
@@ -40,18 +40,18 @@ applicable agreement for further details.
 +----------------------------------------------------------------------------------------+
 ; Flow Summary                                                                           ;
 +-------------------------------------+--------------------------------------------------+
-; Flow Status                         ; Successful - Wed Dec 06 15:09:22 2017            ;
+; Flow Status                         ; Successful - Fri Dec 08 20:56:00 2017            ;
 ; Quartus II 64-Bit Version           ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Full Version ;
 ; Revision Name                       ; AP9                                              ;
 ; Top-level Entity Name               ; AP9                                              ;
 ; Family                              ; Cyclone V                                        ;
 ; Device                              ; 5CEBA4F23C7                                      ;
 ; Timing Models                       ; Final                                            ;
-; Logic utilization (in ALMs)         ; 16,595 / 18,480 ( 90 % )                         ;
-; Total registers                     ; 2039                                             ;
+; Logic utilization (in ALMs)         ; 10,019 / 18,480 ( 54 % )                         ;
+; Total registers                     ; 1009                                             ;
 ; Total pins                          ; 26 / 224 ( 12 % )                                ;
 ; Total virtual pins                  ; 0                                                ;
-; Total block memory bits             ; 413,824 / 3,153,920 ( 13 % )                     ;
+; Total block memory bits             ; 421,888 / 3,153,920 ( 13 % )                     ;
 ; Total DSP Blocks                    ; 0 / 66 ( 0 % )                                   ;
 ; Total HSSI RX PCSs                  ; 0                                                ;
 ; Total HSSI PMA RX Deserializers     ; 0                                                ;
@@ -69,7 +69,7 @@ applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 12/06/2017 14:58:51 ;
+; Start date & time ; 12/08/2017 20:49:49 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; AP9                 ;
 +-------------------+---------------------+
@@ -81,7 +81,7 @@ applicable agreement for further details.
 ; Assignment Name                     ; Value                                 ; Default Value ; Entity Name ; Section Id ;
 +-------------------------------------+---------------------------------------+---------------+-------------+------------+
 ; BLOCK_DESIGN_NAMING                 ; QuartusII                             ; Auto          ; --          ; --         ;
-; COMPILER_SIGNATURE_ID               ; 62580476984789.151257953104072        ; --            ; --          ; --         ;
+; COMPILER_SIGNATURE_ID               ; 62580476982938.151277338901268        ; --            ; --          ; --         ;
 ; IP_TOOL_NAME                        ; ROM: 1-PORT                           ; --            ; --          ; --         ;
 ; IP_TOOL_NAME                        ; RAM: 1-PORT                           ; --            ; --          ; --         ;
 ; IP_TOOL_VERSION                     ; 10.1                                  ; --            ; --          ; --         ;
@@ -107,11 +107,11 @@ applicable agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:03:35     ; 1.0                     ; 1089 MB             ; 00:03:04                           ;
-; Fitter                    ; 00:06:27     ; 2.4                     ; 2208 MB             ; 00:10:23                           ;
-; Assembler                 ; 00:00:46     ; 1.0                     ; 758 MB              ; 00:00:14                           ;
-; TimeQuest Timing Analyzer ; 00:01:26     ; 2.5                     ; 1561 MB             ; 00:02:00                           ;
-; Total                     ; 00:12:14     ; --                      ; --                  ; 00:15:41                           ;
+; Analysis & Synthesis      ; 00:02:01     ; 1.0                     ; 759 MB              ; 00:01:30                           ;
+; Fitter                    ; 00:03:49     ; 2.2                     ; 2099 MB             ; 00:05:20                           ;
+; Assembler                 ; 00:00:41     ; 1.0                     ; 699 MB              ; 00:00:11                           ;
+; TimeQuest Timing Analyzer ; 00:01:06     ; 2.3                     ; 1349 MB             ; 00:01:16                           ;
+; Total                     ; 00:07:37     ; --                      ; --                  ; 00:08:17                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -120,10 +120,10 @@ applicable agreement for further details.
 +---------------------------+------------------+-----------+------------+----------------+
 ; Module Name               ; Machine Hostname ; OS Name   ; OS Version ; Processor type ;
 +---------------------------+------------------+-----------+------------+----------------+
-; Analysis & Synthesis      ; 6-305-20         ; Windows 7 ; 6.2        ; x86_64         ;
-; Fitter                    ; 6-305-20         ; Windows 7 ; 6.2        ; x86_64         ;
-; Assembler                 ; 6-305-20         ; Windows 7 ; 6.2        ; x86_64         ;
-; TimeQuest Timing Analyzer ; 6-305-20         ; Windows 7 ; 6.2        ; x86_64         ;
+; Analysis & Synthesis      ; 6-305-14         ; Windows 7 ; 6.2        ; x86_64         ;
+; Fitter                    ; 6-305-14         ; Windows 7 ; 6.2        ; x86_64         ;
+; Assembler                 ; 6-305-14         ; Windows 7 ; 6.2        ; x86_64         ;
+; TimeQuest Timing Analyzer ; 6-305-14         ; Windows 7 ; 6.2        ; x86_64         ;
 +---------------------------+------------------+-----------+------------+----------------+
 
 
