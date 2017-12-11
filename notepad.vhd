@@ -39,9 +39,11 @@ ARCHITECTURE a OF notepad IS
 	--Cor do bloco
 	SIGNAL BLOCOCOR   : STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL APAGACOR   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-		
-	SIGNAL MAPA : STD_LOGIC_VECTOR(240 DOWNTO 0);
+	
+	TYPE COR_ARRAY IS ARRAY (239 DOWNTO 0) OF STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL MAPA : COR_ARRAY;
 	SIGNAL APAGA_POS   : STD_LOGIC_VECTOR(15 DOWNTO 0);
+
 	
 	--Posicoes que deverao ser desenhadas
 	SIGNAL BLOCO1   : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -64,6 +66,7 @@ ARCHITECTURE a OF notepad IS
 
 	SIGNAL SAPOESTADO : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL TECLAESTADO : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL PROXESTADO : STD_LOGIC_VECTOR(7 DOWNTO 0);
 BEGIN
 	
 -- Peças
@@ -80,7 +83,7 @@ PROCESS (clk, reset)
 	IF RESET = '1' THEN
 		BLOCOCHAR <= "00000001";
 		CONTADOR <= (others =>'0');
-		BLOCOCOR <= x"B";
+		BLOCOCOR <= x"A";
 		BLOCO1 <= x"0088";
 		BLOCO2 <= x"0089";
 		BLOCO3 <= x"00B0";
@@ -101,21 +104,21 @@ PROCESS (clk, reset)
 			WHEN x"00" =>
 			
 				--Se nenhum dos blocos tiver atingido o chão
-				IF(BLOCO1 < 1039 and BLOCO2 < 1039 and BLOCO3 < 1039 and BLOCO4 < 1039 AND MAPA(B1_POS + 10) = '0' AND MAPA(B2_POS + 10) = '0' AND MAPA(B3_POS + 10) = '0' AND MAPA(B4_POS + 10) = '0') THEN
+				IF(BLOCO1 < 1039 and BLOCO2 < 1039 and BLOCO3 < 1039 and BLOCO4 < 1039 AND MAPA(B1_POS + 10) = x"0" AND MAPA(B2_POS + 10) = x"0" AND MAPA(B3_POS + 10) = x"0" AND MAPA(B4_POS + 10) = x"0") THEN
 					BLOCO1 <= BLOCO1 + x"28";
 					BLOCO2 <= BLOCO2 + x"28";
 					BLOCO3 <= BLOCO3 + x"28";
 					BLOCO4 <= BLOCO4 + x"28";
 				--Se algum dos blocos tiver colidido, mande outro bloco
 				ELSE
-					TIPO_PECA := (conv_integer(BLOCO1) + conv_integer(CONTADOR)) MOD 7;
+					TIPO_PECA := (conv_integer(BLOCO4A) * conv_integer(BLOCO1) + conv_integer(CONTADOR)/conv_integer(BLOCO2)) MOD 7;
 					--TIPO_PECA := 0; -- MUDANCA 1 
 					TIPO_ROTACAO := 0;
 					--Escolhe a peça que será enviada
 					CASE (TIPO_PECA) IS
 						--  1□ 2□ 3□ 4□
 						WHEN 0 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"9";
 							BLOCO1 <= x"0088";
 							BLOCO2 <= x"0089";
 							BLOCO3 <= x"008A";
@@ -123,7 +126,7 @@ PROCESS (clk, reset)
 						-- 1□
 						-- 2□ 3□ 4□ 
 						WHEN 1 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"3";
 							BLOCO1 <= x"0088";
 							BLOCO2 <= x"00B0";
 							BLOCO3 <= x"00B1";
@@ -140,7 +143,7 @@ PROCESS (clk, reset)
 						-- 1□ 2□
 						-- 3□ 4□
 						WHEN 3 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"A";
 							BLOCO1 <= x"0088";
 							BLOCO2 <= x"0089";
 							BLOCO3 <= x"00B0";
@@ -149,7 +152,7 @@ PROCESS (clk, reset)
 						--    3□ 4□
 						-- 1□ 2□
 						WHEN 4 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"F";
 							BLOCO1 <= x"00B2";
 							BLOCO2 <= x"00B3";
 							BLOCO3 <= x"008B";
@@ -157,7 +160,7 @@ PROCESS (clk, reset)
 						--    4□
 						-- 1□ 2□ 3□
 						WHEN 5 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"E";
 							BLOCO1 <= x"00B2";
 							BLOCO2 <= x"00B3";
 							BLOCO3 <= x"00B4";
@@ -165,7 +168,7 @@ PROCESS (clk, reset)
 						-- 1□ 2□
 						--    3□ 4□
 						WHEN 6 =>
-							BLOCOCOR <= x"B";
+							BLOCOCOR <= x"C";
 							BLOCO1 <= x"0088";
 							BLOCO2 <= x"0089";
 							BLOCO3 <= x"00B1";
@@ -191,7 +194,7 @@ PROCESS (clk, reset)
 						CASE key IS
 							--(A) ESQUERDA	
 							WHEN x"61" => 
-								IF (NOT((conv_integer(BLOCO1) MOD 40) = 15) and NOT((conv_integer(BLOCO2) MOD 40) = 15) and NOT((conv_integer(BLOCO3) MOD 40) = 15) and NOT((conv_integer(BLOCO4) MOD 40) = 15) and MAPA(B1_POS - 1) = '0' and MAPA(B2_POS - 1) = '0' and MAPA(B3_POS - 1) = '0' and MAPA(B4_POS - 1) = '0') THEN   -- nao esta' na extrema esquerda
+								IF (NOT((conv_integer(BLOCO1) MOD 40) = 15) and NOT((conv_integer(BLOCO2) MOD 40) = 15) and NOT((conv_integer(BLOCO3) MOD 40) = 15) and NOT((conv_integer(BLOCO4) MOD 40) = 15) and MAPA(B1_POS - 1) = x"0" and MAPA(B2_POS - 1) = x"0" and MAPA(B3_POS - 1) = x"0" and MAPA(B4_POS - 1) = x"0") THEN   -- nao esta' na extrema esquerda
 									BLOCO1 <= BLOCO1 - x"01";
 									BLOCO2 <= BLOCO2 - x"01";
 									BLOCO3 <= BLOCO3 - x"01";
@@ -199,7 +202,7 @@ PROCESS (clk, reset)
 								END IF;
 							--(D) DIREITA
 							WHEN x"64" => 
-								IF (NOT((conv_integer(BLOCO1) MOD 40) = 24) and NOT((conv_integer(BLOCO2) MOD 40) = 24) and NOT((conv_integer(BLOCO3) MOD 40) = 24) and NOT((conv_integer(BLOCO4) MOD 40) = 24) and MAPA(B1_POS + 1) = '0' and MAPA(B2_POS + 1) = '0' and MAPA(B3_POS + 1) = '0' and MAPA(B4_POS + 1) = '0') THEN   -- nao esta' na extrema direita
+								IF (NOT((conv_integer(BLOCO1) MOD 40) = 24) and NOT((conv_integer(BLOCO2) MOD 40) = 24) and NOT((conv_integer(BLOCO3) MOD 40) = 24) and NOT((conv_integer(BLOCO4) MOD 40) = 24) and MAPA(B1_POS + 1) = x"0" and MAPA(B2_POS + 1) = x"0" and MAPA(B3_POS + 1) = x"0" and MAPA(B4_POS + 1) = x"0") THEN   -- nao esta' na extrema direita
 									BLOCO1 <= BLOCO1 + x"01";
 									BLOCO2 <= BLOCO2 + x"01";
 									BLOCO3 <= BLOCO3 + x"01";
@@ -207,7 +210,7 @@ PROCESS (clk, reset)
 								END IF;
 							--(S) BAIXO
 							WHEN x"73" => 
-								IF (BLOCO1 < 999 and BLOCO2 < 999 and BLOCO3 < 999 and BLOCO4 < 999 AND MAPA(B1_POS + 20) = '0' AND MAPA(B2_POS + 20) = '0' AND MAPA(B3_POS + 20) = '0' AND MAPA(B4_POS + 20) = '0') THEN
+								IF (BLOCO1 < 999 and BLOCO2 < 999 and BLOCO3 < 999 and BLOCO4 < 999 AND MAPA(B1_POS + 20) = x"0" AND MAPA(B2_POS + 20) = x"0" AND MAPA(B3_POS + 20) = x"0" AND MAPA(B4_POS + 20) = x"0") THEN
 									BLOCO1 <= BLOCO1 + x"50";
 									BLOCO2 <= BLOCO2 + x"50";
 									BLOCO3 <= BLOCO3 + x"50";
@@ -400,42 +403,37 @@ END PROCESS;
 PROCESS (clkvideo, reset)
 	VARIABLE POS_APAGAR    : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	
-	VARIABLE LINHA_B1 : INTEGER := 0;
-	VARIABLE LINHA_B2 : INTEGER := 0;
-	VARIABLE LINHA_B3 : INTEGER := 0;
-	VARIABLE LINHA_B4 : INTEGER := 0;
-	
-	VARIABLE FLAG_B1 : STD_LOGIC := '0';
-	VARIABLE FLAG_B2 : STD_LOGIC := '0';
-	VARIABLE FLAG_B3 : STD_LOGIC := '0';
-	VARIABLE FLAG_B4 : STD_LOGIC := '0';
-	
-	VARIABLE FLAG_GO : STD_LOGIC := '0';
-	
-	VARIABLE APAGAR_POS : INTEGER := 0;
-	
-	VARIABLE COLUNAS : INTEGER := 0;
 	VARIABLE B1_POS : INTEGER := 0;
 	VARIABLE B2_POS : INTEGER := 0;
 	VARIABLE B3_POS : INTEGER := 0;
 	VARIABLE B4_POS : INTEGER := 0;
+	VARIABLE FLAG_B1 : STD_LOGIC := '0';
+	VARIABLE FLAG_B2 : STD_LOGIC := '0';
+	VARIABLE FLAG_B3 : STD_LOGIC := '0';
+	VARIABLE FLAG_B4 : STD_LOGIC := '0';
+	VARIABLE FLAG_GO : STD_LOGIC := '0';
+	VARIABLE APAGAR_POS : INTEGER := 0;
+	VARIABLE COLUNAS : INTEGER := 0;
 	
 	VARIABLE PONT : INTEGER := 0;
 BEGIN
 	IF RESET = '1' THEN
+		PONTUACAO <= "000000000000000";
 		VIDEOE <= x"30";
 		APAGA_POS <= x"0087";
 		videoflag <= '0';
 		POUSOU_FLAG <= '0';
 		FLAG_GO := '0';
-		PONTUACAO <= "000000000000000";
-		MAPA <= (others => '0');
-
+		
 		ELSIF (clkvideo'event) and (clkvideo = '1') THEN
 		CASE VIDEOE IS
 			WHEN x"30" =>
-					VIDEOE <= x"31";
+					for i in 0 to 239 loop
+						MAPA(i) <= x"0"; 
+					end loop;
+					VIDEOE <= x"A9";
 	
+			-- Imprime o primeiro digito da pontuação
 			WHEN x"31" =>
 					PONT := (conv_integer(PONTUACAO) MOD 10) + 48;
 			
@@ -446,77 +444,62 @@ BEGIN
 					
 					videoflag <= '1';
 					PONTUACAOA <= PONTUACAO;
-					VIDEOE <= x"32";
-					
-			WHEN x"32" =>
-				videoflag <= '0';
-				VIDEOE <= x"33";
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"33";
 				
+			-- Imprime o segundo dígito da pontuação
 			WHEN x"33" =>
 					PONT := ((conv_integer(PONTUACAO) / 10) MOD 10) + 48;
 			
 					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
 					vga_char(7 downto 0) <= conv_std_logic_vector(PONT,8);
 					vga_pos(15 downto 0)	<= conv_std_logic_vector(69, 16);	
 					
 					videoflag <= '1';
 					PONTUACAOA <= PONTUACAO;
-					VIDEOE <= x"34";
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"35";
 					
-			WHEN x"34" =>
-				videoflag <= '0';
-				VIDEOE <= x"35";
-				
+			-- Imprime o terceiro dígito da pontuação
 			WHEN x"35" =>
 					PONT := ((conv_integer(PONTUACAO) / 100) MOD 10) + 48;
 			
 					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
 					vga_char(7 downto 0) <= conv_std_logic_vector(PONT,8);
 					vga_pos(15 downto 0)	<= conv_std_logic_vector(68, 16);	
 					
 					videoflag <= '1';
 					PONTUACAOA <= PONTUACAO;
-					VIDEOE <= x"36";
-					
-			WHEN x"36" =>
-				videoflag <= '0';
-				VIDEOE <= x"37";
-				
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"37";
+
+			-- Imprime o quarto dígito da pontuação
 			WHEN x"37" =>
 					PONT := ((conv_integer(PONTUACAO) / 1000) MOD 10) + 48;
 					
 					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
 					vga_char(7 downto 0) <= conv_std_logic_vector(PONT,8);
 					vga_pos(15 downto 0)	<= conv_std_logic_vector(67, 16);	
 					
 					videoflag <= '1';
 					PONTUACAOA <= PONTUACAO;
-					VIDEOE <= x"38";
-					
-			WHEN x"38" =>
-				videoflag <= '0';
-				VIDEOE <= x"39";
-				
-				
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"39";
+			
+			-- Imprime o quinto dígito da pontuação
 			WHEN x"39" =>
 					PONT := ((conv_integer(PONTUACAO) / 10000) MOD 10) + 48;
 					
 					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
 					vga_char(7 downto 0) <= conv_std_logic_vector(PONT,8);
 					vga_pos(15 downto 0)	<= conv_std_logic_vector(66, 16);	
 					
 					videoflag <= '1';
 					PONTUACAOA <= PONTUACAO;
-					VIDEOE <= x"40";
 					
-			WHEN x"40" =>
-				videoflag <= '0';
-				VIDEOE <= x"00";
-	
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"00";
+					
 			-- Apaga B1
 			WHEN x"00" =>			
 				IF(BLOCO1 = BLOCO1A) THEN
@@ -530,43 +513,31 @@ BEGIN
 					vga_pos(15 downto 0)	<= BLOCO1A;
 						
 					videoflag <= '1';
-					VIDEOE <= x"01";
+					VIDEOE <= x"DF";
+					PROXESTADO <= x"02";
 				END IF;
-			
-			WHEN x"01" =>
-				videoflag <= '0';
-				VIDEOE <= x"02";
 				
 			-- Apaga B2
 			WHEN x"02" =>
 				vga_pos(15 downto 0)	<= BLOCO2A;
 				videoflag <= '1';
-				VIDEOE <= x"03";
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"04";
 			
-			WHEN x"03" =>
-				videoflag <= '0';
-				VIDEOE <= x"04";
-				
 			-- Apaga B3
 			WHEN x"04" => 			
 				vga_pos(15 downto 0)	<= BLOCO3A;
 				videoflag <= '1';
-				VIDEOE <= x"05";
-				
-			WHEN x"05" =>
-				videoflag <= '0';
-				VIDEOE <= x"06";
-			
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"06";
+
 			-- Apaga B4
 			WHEN x"06" => 			
 				vga_pos(15 downto 0)	<= BLOCO4A;
 				videoflag <= '1';
-				VIDEOE <= x"07";
-				
-			WHEN x"07" =>
-				videoflag <= '0';
-				VIDEOE <= x"08";
-			
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"08";
+
 			-- Desenha B1
 			WHEN x"08" =>
 				IF(POUSOU_FLAG = '1') THEN
@@ -579,59 +550,48 @@ BEGIN
 				vga_pos(15 downto 0)	<= BLOCO1;
 				BLOCO1A <= BLOCO1;
 				videoflag <= '1';
-				VIDEOE <= x"09";
-				
-			WHEN x"09" =>
-				videoflag <= '0';
-				VIDEOE <= x"0A";
-			
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"0A";
+
 			-- Desenha B2
 			WHEN x"0A" =>
 				vga_pos(15 downto 0)	<= BLOCO2;
 				BLOCO2A <= BLOCO2;
 				videoflag <= '1';
-				VIDEOE <= x"0B";
-				
-			WHEN x"0B" =>
-				videoflag <= '0';
-				VIDEOE <= x"0C";
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"0C";
 				
 			-- Desenha B3
 			WHEN x"0C" =>
 				vga_pos(15 downto 0)	<= BLOCO3;
 				BLOCO3A <= BLOCO3;
 				videoflag <= '1';
-				VIDEOE <= x"BB";
-				
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"BB";
+			
+			-- Desenha B4	
 			WHEN x"BB" =>
 				vga_pos(15 downto 0)	<= BLOCO4;
 				BLOCO4A <= BLOCO4;
 				videoflag <= '1';
-				VIDEOE <= x"0D";
-			
-			WHEN x"0D" =>
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"0E";
+				
 				--Calcula a posição no vetor reduzido
-				B1_POS := ((conv_integer(BLOCO1) - 135)/40) * 10 + ((conv_integer(BLOCO1) - 15 ) MOD 40);-- TIRAMOS -15
+				B1_POS := ((conv_integer(BLOCO1) - 135)/40) * 10 + ((conv_integer(BLOCO1) - 15 ) MOD 40);
 				B2_POS := ((conv_integer(BLOCO2) - 135)/40) * 10 + ((conv_integer(BLOCO2) - 15 ) MOD 40);
 				B3_POS := ((conv_integer(BLOCO3) - 135)/40) * 10 + ((conv_integer(BLOCO3) - 15 ) MOD 40);
 				B4_POS := ((conv_integer(BLOCO4) - 135)/40) * 10 + ((conv_integer(BLOCO4) - 15 ) MOD 40);
-				
-				--Calcula posição inicial da linha
-				LINHA_B1 := (B1_POS/10) * 10;
-				LINHA_B2 := (B2_POS/10) * 10;
-				LINHA_B3 := (B3_POS/10) * 10;
-				LINHA_B4 := (B4_POS/10) * 10;
-				VIDEOE <= x"0E";
-				videoflag <= '0';
 			
 			--Verifica se o bloco já pousou
 			WHEN x"0E" =>
-				VIDEOE <= x"0F";
-				IF(NOT(BLOCO1 < 1039 and BLOCO2 < 1039 and BLOCO3 < 1039 and BLOCO4 < 1039 AND MAPA(B1_POS + 10) = '0' AND MAPA(B2_POS + 10) = '0' AND MAPA(B3_POS + 10) = '0' AND MAPA(B4_POS + 10) = '0')) THEN
-						MAPA(B1_POS) <= '1';
-						MAPA(B2_POS) <= '1';
-						MAPA(B3_POS) <= '1';
-						MAPA(B4_POS) <= '1';
+				VIDEOE <= x"DF";
+				PROXESTADO <= x"31";
+				IF(NOT(BLOCO1 < 1039 and BLOCO2 < 1039 and BLOCO3 < 1039 and BLOCO4 < 1039 AND MAPA(B1_POS + 10) = x"0" AND MAPA(B2_POS + 10) = x"0" AND MAPA(B3_POS + 10) = x"0" AND MAPA(B4_POS + 10) = x"0")) THEN
+						MAPA(B1_POS) <= BLOCOCOR;
+						MAPA(B2_POS) <= BLOCOCOR;
+						MAPA(B3_POS) <= BLOCOCOR;
+						MAPA(B4_POS) <= BLOCOCOR;
 						POUSOU_FLAG <= '1';
 						
 						VIDEOE <= x"A0";
@@ -642,6 +602,11 @@ BEGIN
 						END IF;
 					
 				END IF;
+				
+				B1_POS := (B1_POS/10) * 10;
+				B2_POS := (B2_POS/10) * 10;
+				B3_POS := (B3_POS/10) * 10;
+				B4_POS := (B4_POS/10) * 10;
 			
 			WHEN x"0F" =>
 				videoflag <= '0';
@@ -649,37 +614,33 @@ BEGIN
 				
 			--Verifica se a linha de b1 está completa
 			WHEN x"A0" =>
-				--Se todas as posições da linha estiverem ocupadas
-				IF(NOT(MAPA(LINHA_B1 + 1) = '0') AND NOT(MAPA(LINHA_B1 + 2) = '0') AND NOT(MAPA(LINHA_B1 + 3) = '0') AND NOT(MAPA(LINHA_B1 + 4) = '0') AND NOT(MAPA(LINHA_B1 + 5) = '0') AND NOT(MAPA(LINHA_B1 + 6) = '0') AND NOT(MAPA(LINHA_B1 + 7) = '0') AND NOT(MAPA(LINHA_B1 + 8) = '0') AND NOT(MAPA(LINHA_B1 + 9) = '0') AND NOT(MAPA(LINHA_B1) = '0')) THEN
+				--Se todas as posições da linha de B1 estiverem ocupadas
+				IF(NOT(MAPA(B1_POS + 1) = x"0") AND NOT(MAPA(B1_POS + 2) = x"0") AND NOT(MAPA(B1_POS + 3) = x"0") AND NOT(MAPA(B1_POS + 4) = x"0") AND NOT(MAPA(B1_POS + 5) = x"0") AND NOT(MAPA(B1_POS + 6) = x"0") AND NOT(MAPA(B1_POS + 7) = x"0") AND NOT(MAPA(B1_POS + 8) = x"0") AND NOT(MAPA(B1_POS + 9) = x"0") AND NOT(MAPA(B1_POS) = x"0")) THEN
 						FLAG_B1 := '1';
 				END IF;
-				
-				IF(NOT(LINHA_B2 = LINHA_B1) AND NOT(MAPA(LINHA_B2 + 1) = '0') AND NOT(MAPA(LINHA_B2 + 2) = '0') AND NOT(MAPA(LINHA_B2 + 3) = '0') AND NOT(MAPA(LINHA_B2 + 4) = '0') AND NOT(MAPA(LINHA_B2 + 5) = '0') AND NOT(MAPA(LINHA_B2 + 6) = '0') AND NOT(MAPA(LINHA_B2 + 7) = '0') AND NOT(MAPA(LINHA_B2 + 8) = '0') AND NOT(MAPA(LINHA_B2 + 9) = '0') AND NOT(MAPA(LINHA_B2) = '0')) THEN
+				--Se todas as posições da linha de B2 estiverem ocupadas
+				IF(NOT(B2_POS = B1_POS) AND NOT(MAPA(B2_POS + 1) = x"0") AND NOT(MAPA(B2_POS + 2) = x"0") AND NOT(MAPA(B2_POS + 3) = x"0") AND NOT(MAPA(B2_POS + 4) = x"0") AND NOT(MAPA(B2_POS + 5) = x"0") AND NOT(MAPA(B2_POS + 6) = x"0") AND NOT(MAPA(B2_POS + 7) = x"0") AND NOT(MAPA(B2_POS + 8) = x"0") AND NOT(MAPA(B2_POS + 9) = x"0") AND NOT(MAPA(B2_POS) = x"0")) THEN
 						FLAG_B2 := '1';
 				END IF;
-				
-				IF(NOT(LINHA_B3 = LINHA_B1) AND NOT(LINHA_B3 = LINHA_B2) AND NOT(MAPA(LINHA_B3 + 1) = '0') AND NOT(MAPA(LINHA_B3 + 2) = '0') AND NOT(MAPA(LINHA_B3 + 3) = '0') AND NOT(MAPA(LINHA_B3 + 4) = '0') AND NOT(MAPA(LINHA_B3 + 5) = '0') AND NOT(MAPA(LINHA_B3 + 6) = '0') AND NOT(MAPA(LINHA_B3 + 7) = '0') AND NOT(MAPA(LINHA_B3 + 8) = '0') AND NOT(MAPA(LINHA_B3 + 9) = '0') AND NOT(MAPA(LINHA_B3) = '0')) THEN
+				--Se todas as posições da linha de B3 estiverem ocupadas
+				IF(NOT(B3_POS = B1_POS) AND NOT(B3_POS = B2_POS) AND NOT(MAPA(B3_POS + 1) = x"0") AND NOT(MAPA(B3_POS + 2) = x"0") AND NOT(MAPA(B3_POS + 3) = x"0") AND NOT(MAPA(B3_POS + 4) = x"0") AND NOT(MAPA(B3_POS + 5) = x"0") AND NOT(MAPA(B3_POS + 6) = x"0") AND NOT(MAPA(B3_POS + 7) = x"0") AND NOT(MAPA(B3_POS + 8) = x"0") AND NOT(MAPA(B3_POS + 9) = x"0") AND NOT(MAPA(B3_POS) = x"0")) THEN
 						FLAG_B3 := '1';
 				END IF;
-				
-				IF(NOT(LINHA_B4 = LINHA_B1) AND NOT(LINHA_B4 = LINHA_B2) AND NOT(LINHA_B4 = LINHA_B3) AND NOT(MAPA(LINHA_B4 + 1) = '0') AND NOT(MAPA(LINHA_B4 + 2) = '0') AND NOT(MAPA(LINHA_B4 + 3) = '0') AND NOT(MAPA(LINHA_B4 + 4) = '0') AND NOT(MAPA(LINHA_B4 + 5) = '0') AND NOT(MAPA(LINHA_B4 + 6) = '0') AND NOT(MAPA(LINHA_B4 + 7) = '0') AND NOT(MAPA(LINHA_B4 + 8) = '0') AND NOT(MAPA(LINHA_B4 + 9) = '0') AND NOT(MAPA(LINHA_B4) = '0')) THEN
+				--Se todas as posições da linha de B4 estiverem ocupadas
+				IF(NOT(B4_POS = B1_POS) AND NOT(B4_POS = B2_POS) AND NOT(B4_POS = B3_POS) AND NOT(MAPA(B4_POS + 1) = x"0") AND NOT(MAPA(B4_POS + 2) = x"0") AND NOT(MAPA(B4_POS + 3) = x"0") AND NOT(MAPA(B4_POS + 4) = x"0") AND NOT(MAPA(B4_POS + 5) = x"0") AND NOT(MAPA(B4_POS + 6) = x"0") AND NOT(MAPA(B4_POS + 7) = x"0") AND NOT(MAPA(B4_POS + 8) = x"0") AND NOT(MAPA(B4_POS + 9) = x"0") AND NOT(MAPA(B4_POS) = x"0")) THEN
 						FLAG_B4 := '1';
 				END IF;
 				
-				VIDEOE <= x"A3";
-
-			WHEN x"A3" =>
-				--Se todas as posições da linha estiverem ocupadas
-				LINHA_B1 := LINHA_B1 + 9;
-				LINHA_B2 := LINHA_B2 + 9;
-				LINHA_B3 := LINHA_B3 + 9;
-				LINHA_B4 := LINHA_B4 + 9;
-				
+				--Seta a posição para o final da linha
+				B1_POS := B1_POS + 9;
+				B2_POS := B2_POS + 9;
+				B3_POS := B3_POS + 9;
+				B4_POS := B4_POS + 9;
 				VIDEOE <= x"A4";
 			
 			--Shifta todos os blocos para baixo
 			WHEN x"A4" =>
-				IF(LINHA_B1 < 10 OR FLAG_B1 = '0') THEN
+				IF(B1_POS < 10 OR FLAG_B1 = '0') THEN
 				
 					IF (FLAG_B1 = '1') THEN 
 						PONTUACAO <= PONTUACAO + x"0A";
@@ -687,12 +648,12 @@ BEGIN
 					
 					VIDEOE <= x"A5";
 				ELSE
-					MAPA(LINHA_B1) <= MAPA(LINHA_B1 - 10);
-					LINHA_B1 := LINHA_B1 - 1;
+					MAPA(B1_POS) <= MAPA(B1_POS - 10);
+					B1_POS := B1_POS - 1;
 				END IF;
 			--Shifta todos os blocos para baixo
 			WHEN x"A5" =>
-				IF(LINHA_B2 < 10 OR FLAG_B2 = '0') THEN
+				IF(B2_POS < 10 OR FLAG_B2 = '0') THEN
 				
 					IF (FLAG_B2 = '1') THEN 
 						PONTUACAO <= PONTUACAO + x"0A";
@@ -700,12 +661,12 @@ BEGIN
 					
 					VIDEOE <= x"A6";
 				ELSE
-					MAPA(LINHA_B2) <= MAPA(LINHA_B2 - 10);
-					LINHA_B2 := LINHA_B2 - 1;
+					MAPA(B2_POS) <= MAPA(B2_POS - 10);
+					B2_POS := B2_POS - 1;
 				END IF;
 			--Shifta todos os blocos para baixo
 			WHEN x"A6" =>
-				IF(LINHA_B3 < 10 OR FLAG_B3 = '0') THEN
+				IF(B3_POS < 10 OR FLAG_B3 = '0') THEN
 				
 					IF (FLAG_B3 = '1') THEN 
 						PONTUACAO <= PONTUACAO + x"0A";
@@ -713,13 +674,13 @@ BEGIN
 					
 					VIDEOE <= x"A7";
 				ELSE
-					MAPA(LINHA_B3) <= MAPA(LINHA_B3 - 10);
-					LINHA_B3 := LINHA_B3 - 1;
+					MAPA(B3_POS) <= MAPA(B3_POS - 10);
+					B3_POS := B3_POS - 1;
 				END IF;
 				
 			--Shifta todos os blocos para baixo
 			WHEN x"A7" =>
-				IF(LINHA_B4 < 10 OR FLAG_B4 = '0') THEN
+				IF(B4_POS < 10 OR FLAG_B4 = '0') THEN
 				
 					IF (FLAG_B4 = '1') THEN 
 						PONTUACAO <= PONTUACAO + x"0A";
@@ -727,8 +688,8 @@ BEGIN
 					
 					VIDEOE <= x"FA";
 				ELSE
-					MAPA(LINHA_B4) <= MAPA(LINHA_B4 - 10);
-					LINHA_B4 := LINHA_B4 - 1;
+					MAPA(B4_POS) <= MAPA(B4_POS - 10);
+					B4_POS := B4_POS - 1;
 				END IF;
 				
 			WHEN x"FA" =>
@@ -743,15 +704,18 @@ BEGIN
 				END IF;
 			--Redesenha a Tela
 			WHEN x"A8" =>
-				--modifiquei aqui de 24 para 25
 				IF(COLUNAS = 24)THEN
 					COLUNAS := 0;
+					
+					--Se não for GAME OVER
 					IF(FLAG_GO = '0') THEN	
 						VIDEOE <= x"0F";
 					ELSE
 						FLAG_GO := '0';
 						VIDEOE <= x"F5";
 					END IF;
+					
+					--Reseta a posição inicial para apagar
 					APAGA_POS <= x"0087";
 					videoflag <= '0';
 				ELSE	
@@ -761,134 +725,105 @@ BEGIN
 					vga_pos(15 downto 0)	<= APAGA_POS;
 					
 					--Incrementa a posicao
-					APAGA_POS <= APAGA_POS +  x"01";
+					APAGA_POS <= APAGA_POS + x"01";
 					videoflag <= '1';
 					VIDEOE <= x"A9";
 				END IF;
+			
 			WHEN x"A9" =>
+				--Caso tenha ultrapassado o limite direito
 				IF(conv_integer(APAGA_POS) MOD 40 >= 25) THEN
 					APAGA_POS <= APAGA_POS + x"1E";
 					COLUNAS := COLUNAS + 1;
 				END IF;
 				videoflag <= '0';
 				VIDEOE <= x"AA";
+			
 			WHEN x"AA" =>
+				--Calcula a posição no vetor reduzido
 				APAGAR_POS := ((conv_integer(APAGA_POS) - 135)/40) * 10 + ((conv_integer(APAGA_POS) - 15) MOD 40);
-				videoflag <= '0';
 				VIDEOE <= x"AB";
+			
 			WHEN x"AB" =>
-				IF(MAPA(APAGAR_POS) = '1' and NOT(FLAG_GO = '1')) THEN
-					APAGACOR <= x"B";	
+				--Se estiver vazia a posição, ou for GAMEOVER, imprima preto
+				IF(NOT(MAPA(APAGAR_POS) = x"0") and NOT(FLAG_GO = '1')) THEN
+					APAGACOR <= MAPA(APAGAR_POS);	
 				ELSE
 					APAGACOR <= x"0";	
 				END IF;
 				VIDEOE <= x"A8";
-				videoflag <= '0';
+				
+			--Desenha (G)AMEOVER
 			WHEN x"F5" =>
 					vga_char(15 downto 12) <= "0000";
 					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"67"; -- g
+					vga_char(7 downto 0) <= x"67";
 					vga_pos(15 downto 0)	<= x"01CA";
-					
-					VIDEOE <= x"D1";
 					videoflag <= '1';
-					
-			WHEN x"D1" =>
-				VIDEOE <= x"D2";
-				videoflag <= '0';
-				
-			WHEN x"D2" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"61"; -- a
-					vga_pos(15 downto 0)	<= x"01CB";
-					
-					VIDEOE <= x"D3";
-					videoflag <= '1';
-					
-			WHEN x"D3" =>
-				VIDEOE <= x"D4";
-				videoflag <= '0';
-				
-			WHEN x"D4" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"6D"; -- m
-					vga_pos(15 downto 0)	<= x"01CC";
-					
-					VIDEOE <= x"D5";
-					videoflag <= '1';
-					
-			WHEN x"D5" =>
-				VIDEOE <= x"D6";
-				videoflag <= '0';
-				
-			WHEN x"D6" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"65"; -- e
-					vga_pos(15 downto 0)	<= x"01CD";
-					
-					VIDEOE <= x"D7";
-					videoflag <= '1';
-					
-			WHEN x"D7" =>
-				VIDEOE <= x"D8";
-				videoflag <= '0';
-				
-			WHEN x"D8" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"6F"; -- o
-					vga_pos(15 downto 0)	<= x"01F2";
-					
-					VIDEOE <= x"D9";
-					videoflag <= '1';
-					
-			WHEN x"D9" =>
-				VIDEOE <= x"DA";
-				videoflag <= '0';
-				
-			WHEN x"DA" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"76"; -- v
-					vga_pos(15 downto 0)	<= x"01F3";
-					
-					VIDEOE <= x"DB";
-					videoflag <= '1';
-					
-			WHEN x"DB" =>
-				VIDEOE <= x"DC";
-				videoflag <= '0';
-				
-			WHEN x"DC" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"65"; -- e
-					vga_pos(15 downto 0)	<= x"01F4";
-					
-					VIDEOE <= x"DD";
-					videoflag <= '1';
-					
-			WHEN x"DD" =>
-				VIDEOE <= x"DE";
-				videoflag <= '0';
-				
-			WHEN x"DE" =>
-					vga_char(15 downto 12) <= "0000";
-					vga_char(11 downto 8) <= "1111";
-					vga_char(7 downto 0) <= x"72"; -- R
-					vga_pos(15 downto 0)	<= x"01F5";
-					
+					PROXESTADO <= x"D2";
 					VIDEOE <= x"DF";
+			
+			--Desenha G(A)MEOVER
+			WHEN x"D2" =>
+					vga_char(7 downto 0) <= x"61";
+					vga_pos(15 downto 0)	<= x"01CB";
 					videoflag <= '1';
+					PROXESTADO <= x"D4";
+					VIDEOE <= x"DF";
+			
+			--Desenha GA(M)EOVER
+			WHEN x"D4" =>
+					vga_char(7 downto 0) <= x"6D";
+					vga_pos(15 downto 0)	<= x"01CC";
+					videoflag <= '1';
+					PROXESTADO <= x"D6";
+					VIDEOE <= x"DF";
 					
+			--Desenha GAM(E)OVER
+			WHEN x"D6" =>
+					vga_char(7 downto 0) <= x"65";
+					vga_pos(15 downto 0)	<= x"01CD";
+					videoflag <= '1';
+					PROXESTADO <= x"D8";
+					VIDEOE <= x"DF";
+			
+			--Desenha GAME(O)VER
+			WHEN x"D8" =>
+					vga_char(7 downto 0) <= x"6F";
+					vga_pos(15 downto 0)	<= x"01F2";
+					videoflag <= '1';
+					PROXESTADO <= x"DA";
+					VIDEOE <= x"DF";
+					
+			--Desenha GAMEO(V)ER
+			WHEN x"DA" =>
+					vga_char(7 downto 0) <= x"76";
+					vga_pos(15 downto 0)	<= x"01F3";
+					videoflag <= '1';
+					PROXESTADO <= x"DC";
+					VIDEOE <= x"DF";
+			
+			--Desenha GAMEOV(E)R
+			WHEN x"DC" =>
+					vga_char(7 downto 0) <= x"65";
+					vga_pos(15 downto 0)	<= x"01F4";
+					videoflag <= '1';
+					PROXESTADO <= x"DE";
+					VIDEOE <= x"DF";
+					
+			--Desenha GAMEOVE(R)	
+			WHEN x"DE" =>
+					vga_char(7 downto 0) <= x"72";
+					vga_pos(15 downto 0)	<= x"01F5";
+					videoflag <= '1';
+					PROXESTADO <= x"DF";
+					VIDEOE <= x"DF";
+
 			WHEN x"DF" =>
-				VIDEOE <= x"DF";
+				VIDEOE <= PROXESTADO;
 				videoflag <= '0';
 			WHEN OTHERS =>
-		END CASE;
+		END CASE;S
 	END IF;
 END PROCESS;
 
